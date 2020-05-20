@@ -1,4 +1,5 @@
 const regex = /\n\n<!-- probot = (.*) -->/
+const secondRegex = /:([^;]*)}/
 
 module.exports = (context, issue = null) => {
   const github = context.github
@@ -45,6 +46,25 @@ module.exports = (context, issue = null) => {
 
       const {owner, repo, number} = issue
       return github.issues.update({owner, repo, number, body})
+    },
+    async getAll () {
+      let body = issue.body
+
+      if (!body) {
+        body = (await github.issues.get(issue)).data.body || ''
+      }
+      const all = body.match(regex)
+      if (all) {
+        const fullSet = all[1].match(secondRegex)
+        const data = JSON.parse(fullSet[1])
+        const dict = {}
+
+        for (let i in data) {
+          dict[i] = data[i]
+        }
+        return dict
+      }
     }
+
   }
 }

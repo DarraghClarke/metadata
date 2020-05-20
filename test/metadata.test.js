@@ -237,4 +237,21 @@ describe('metadata', () => {
       })
     })
   })
+  describe('get all test', () => {
+    const issue = {
+      owner: 'foo',
+      repo: 'bar',
+      number: 42,
+      body: 'hello world\n\n<!-- probot = {"1":{"hello":"world","foo":"bar"}} -->'
+    }
+
+    describe('getAll', () => {
+      test('returns the value without an API call', async () => {
+        let dictionary = await metadata(context, issue).getAll()
+        expect(dictionary['hello']).toEqual('world')
+        expect(dictionary['foo']).toEqual('bar')
+        expect(github.issues.get).not.toHaveBeenCalled()
+      })
+    })
+  })
 })
